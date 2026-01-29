@@ -1,33 +1,35 @@
 import { setupManifest } from '@start9labs/start-sdk'
 
 export const manifest = setupManifest({
-  id: 'hello-world',
-  title: 'Hello World',
-  license: 'MIT',
-  wrapperRepo: 'https://github.com/Start9Labs/hello-world-startos',
-  upstreamRepo: 'https://github.com/Start9Labs/hello-world',
-  supportSite: 'https://docs.start9.com/',
-  marketingSite: 'https://start9.com/',
-  donationUrl: 'https://donate.start9.com/',
-  docsUrl:
-    'https://github.com/Start9Labs/hello-world-startos/blob/master/instructions.md',
+  id: 'minecraft',
+  title: 'Minecraft Server',
+  license: 'Various',
+  wrapperRepo: 'https://github.com/Scott-Sanderson/minecraft-startos',
+  upstreamRepo: 'https://github.com/itzg/docker-minecraft-server',
+  supportSite: 'https://github.com/itzg/docker-minecraft-server/issues',
+  marketingSite: 'https://www.minecraft.net/',
+  donationUrl: null,
+  docsUrl: 'https://docker-minecraft-server.readthedocs.io/',
   description: {
-    short: 'Bare bones example of a StartOS service',
-    long: 'Hello World is a template service that provides examples of basic StartOS features.',
+    short: 'Java Edition Minecraft server with web-based management',
+    long: 'Minecraft Server is a vanilla Java Edition server with RCON-based web administration, configurable memory, whitelist management, and persistent world data.',
   },
   volumes: ['main'],
   images: {
-    'hello-world': {
-      source: { dockerTag: 'start9/hello-world' },
+    'minecraft-server': {
+      source: { dockerTag: 'itzg/minecraft-server:latest' },
+    },
+    'rcon': {
+      source: { dockerTag: 'itzg/rcon:latest' },
     },
   },
   alerts: {
-    install: null,
-    update: null,
-    uninstall: null,
-    restore: null,
+    install: 'Minecraft server installed! Access the Web Admin UI or use actions to get connection details.',
+    update: 'Minecraft server updated. Your world data and settings are preserved.',
+    uninstall: 'All Minecraft server data, including world saves, will be permanently deleted.',
+    restore: 'Minecraft server restored from backup.',
     start: null,
-    stop: null,
+    stop: 'Players will be disconnected when the server stops.',
   },
   dependencies: {},
 })

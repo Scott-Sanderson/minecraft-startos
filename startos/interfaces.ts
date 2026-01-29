@@ -1,15 +1,16 @@
 import { sdk } from './sdk'
-import { uiPort } from './utils'
+import { gamePort, webAdminPort } from './utils'
 
 export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
-  const uiMulti = sdk.MultiHost.of(effects, 'ui-multi')
-  const uiMultiOrigin = await uiMulti.bindPort(uiPort, {
+  // Web Admin Interface
+  const webAdminMulti = sdk.MultiHost.of(effects, 'web-admin-multi')
+  const webAdminOrigin = await webAdminMulti.bindPort(webAdminPort, {
     protocol: 'http',
   })
-  const ui = sdk.createInterface(effects, {
-    name: 'Web UI',
-    id: 'ui',
-    description: 'The web interface of Hello World',
+  const webAdminInterface = sdk.createInterface(effects, {
+    name: 'Web Admin',
+    id: 'web-admin',
+    description: 'RCON-based web administration interface',
     type: 'ui',
     masked: false,
     schemeOverride: null,
@@ -17,8 +18,28 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     path: '',
     query: {},
   })
+  const webAdminReceipt = await webAdminOrigin.export([webAdminInterface])
 
-  const uiReceipt = await uiMultiOrigin.export([ui])
+  // Minecraft Game Server Interface
+  const minecraftMulti = sdk.MultiHost.of(effects, 'minecraft-multi')
+  const minecraftOrigin = await minecraftMulti.bindPort(gamePort, {
+    protocol: null,
+    preferredExternalPort: gamePort,
+    addSsl: null,
+    secure: null,
+  })
+  const minecraftInterface = sdk.createInterface(effects, {
+    name: 'Minecraft Server',
+    id: 'minecraft-server',
+    description: 'Minecraft game server connection (Java Edition)',
+    type: 'p2p',
+    masked: false,
+    schemeOverride: null,
+    username: null,
+    path: '',
+    query: {},
+  })
+  const minecraftReceipt = await minecraftOrigin.export([minecraftInterface])
 
-  return [uiReceipt]
+  return [webAdminReceipt, minecraftReceipt]
 })

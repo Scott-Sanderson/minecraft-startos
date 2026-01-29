@@ -1,5 +1,5 @@
 {
-  "name": "hello-world-startos",
+  "name": "minecraft-startos",
   "scripts": {
     "build": "rm -rf ./javascript && ncc build startos/index.ts -o ./javascript",
     "prettier": "prettier --write startos",
@@ -19,5 +19,23 @@
     "tabWidth": 2,
     "semi": false,
     "singleQuote": true
-  }
+  },
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <img src=\"icon.png\" alt=\"Project Logo\" width=\"21%\"> </p>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Scott-Sanderson/minecraft-startos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Scott-Sanderson/minecraft-startos/issues"
+  },
+  "homepage": "https://github.com/Scott-Sanderson/minecraft-startos#readme"
 }
