@@ -1,12 +1,12 @@
 import { sdk } from './sdk'
-import { gamePort, rconPort, webAdminPort } from './utils'
-import { storeJson } from './fileModels/store.json'
+import { gamePort, minecraftVersion, rconPort, webAdminPort } from './utils'
+import { normalizeStoreConfig, storeJson } from './fileModels/store.json'
 import { writeFile } from 'fs/promises'
 
 export const main = sdk.setupMain(async ({ effects }) => {
-  const config = await storeJson.read((s) => s).const(effects)
+  const config = normalizeStoreConfig(await storeJson.read().const(effects))
 
-  if (!config) {
+  if (!config || !config.rconPassword || !config.webAdminPassword) {
     throw new Error('Configuration not found. Please restart the service.')
   }
 
@@ -52,7 +52,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
         env: {
           EULA: 'TRUE',
           TYPE: 'VANILLA',
-          VERSION: 'LATEST',
+          VERSION: minecraftVersion,
           MODE: config.gameMode,
           DIFFICULTY: config.difficulty,
           INIT_MEMORY: config.memory.initial,
@@ -97,6 +97,9 @@ export const main = sdk.setupMain(async ({ effects }) => {
             errorMessage: 'Web admin is not ready',
           }),
       },
-      requires: ['minecraft-server'],
+      // StartOS 0.4.0-alpha.16 rejects the SDK's intermediate "waiting"
+      // health state for daemon dependencies, so we avoid dependency gating
+      // here and let the web admin's own readiness check settle naturally.
+      requires: [],
     })
 })

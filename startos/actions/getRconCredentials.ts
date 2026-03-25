@@ -1,5 +1,5 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import { normalizeStoreConfig, storeJson } from '../fileModels/store.json'
 import { rconPort } from '../utils'
 
 export const getRconCredentials = sdk.Action.withoutInput(
@@ -13,13 +13,13 @@ export const getRconCredentials = sdk.Action.withoutInput(
     visibility: 'enabled',
   }),
   async ({ effects }) => {
-    const config = await storeJson.read((s) => s).once()
+    const config = normalizeStoreConfig(await storeJson.read().once())
 
-    if (!config) {
+    if (!config || !config.rconPassword) {
       return {
         version: '1',
         title: 'Error',
-        message: 'Configuration not found',
+        message: 'RCON credentials have not been initialized yet',
         result: null,
       }
     }

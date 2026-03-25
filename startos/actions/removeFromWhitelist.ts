@@ -1,5 +1,5 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import { normalizeStoreConfig, storeJson } from '../fileModels/store.json'
 
 const { InputSpec, Value } = sdk
 
@@ -27,7 +27,7 @@ export const removeFromWhitelist = sdk.Action.withInput(
   inputSpec,
   async () => undefined,
   async ({ effects, input }) => {
-    const currentConfig = await storeJson.read().once()
+    const currentConfig = normalizeStoreConfig(await storeJson.read().once())
 
     if (!currentConfig) {
       return {
@@ -52,8 +52,7 @@ export const removeFromWhitelist = sdk.Action.withInput(
     // Remove player from whitelist
     const updatedWhitelist = currentConfig.whitelist.filter(p => p.name !== input.name)
 
-    await storeJson.write(effects, {
-      ...currentConfig,
+    await storeJson.merge(effects, {
       whitelist: updatedWhitelist,
     })
 

@@ -1,5 +1,5 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import { normalizeStoreConfig, storeJson } from '../fileModels/store.json'
 
 export const getWebAdminCredentials = sdk.Action.withoutInput(
   'get-web-admin-credentials',
@@ -12,13 +12,13 @@ export const getWebAdminCredentials = sdk.Action.withoutInput(
     visibility: 'enabled',
   }),
   async ({ effects }) => {
-    const config = await storeJson.read((s) => s).once()
+    const config = normalizeStoreConfig(await storeJson.read().once())
 
-    if (!config) {
+    if (!config || !config.webAdminPassword) {
       return {
         version: '1',
         title: 'Error',
-        message: 'Configuration not found',
+        message: 'Web admin credentials have not been initialized yet',
         result: null,
       }
     }

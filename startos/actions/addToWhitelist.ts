@@ -1,5 +1,5 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import { normalizeStoreConfig, storeJson } from '../fileModels/store.json'
 
 const { InputSpec, Value } = sdk
 
@@ -35,7 +35,7 @@ export const addToWhitelist = sdk.Action.withInput(
   inputSpec,
   async () => undefined,
   async ({ effects, input }) => {
-    const currentConfig = await storeJson.read().once()
+    const currentConfig = normalizeStoreConfig(await storeJson.read().once())
 
     if (!currentConfig) {
       return {
@@ -63,8 +63,7 @@ export const addToWhitelist = sdk.Action.withInput(
       { name: input.name, uuid: input.uuid || undefined },
     ]
 
-    await storeJson.write(effects, {
-      ...currentConfig,
+    await storeJson.merge(effects, {
       whitelist: updatedWhitelist,
       whitelistEnabled: true,
     })
