@@ -1,4 +1,14 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { minecraftImageTag, minecraftVersion } from '../utils'
+import {
+  installAlert,
+  longDescription,
+  restoreAlert,
+  shortDescription,
+  stopAlert,
+  uninstallAlert,
+  updateAlert,
+} from './i18n'
 
 export const manifest = setupManifest({
   id: 'minecraft',
@@ -11,25 +21,27 @@ export const manifest = setupManifest({
   donationUrl: null,
   docsUrl: 'https://docker-minecraft-server.readthedocs.io/',
   description: {
-    short: 'Java Edition Minecraft server with web-based management',
-    long: 'Minecraft Server is a vanilla Java Edition server with RCON-based web administration, configurable memory, whitelist management, and persistent world data.',
+    short: shortDescription,
+    long: longDescription,
   },
   volumes: ['main'],
   images: {
     'minecraft-server': {
-      source: { dockerTag: 'itzg/minecraft-server:latest' },
+      source: { dockerTag: `itzg/minecraft-server:${minecraftImageTag}` },
+      arch: ['aarch64'],
     },
     'rcon': {
       source: { dockerTag: 'itzg/rcon:latest' },
+      arch: ['aarch64'],
     },
   },
   alerts: {
-    install: 'Minecraft server installed! Access the Web Admin UI or use actions to get connection details.',
-    update: 'Minecraft server updated. Your world data and settings are preserved.',
-    uninstall: 'All Minecraft server data, including world saves, will be permanently deleted.',
-    restore: 'Minecraft server restored from backup.',
+    install: installAlert,
+    update: updateAlert,
+    uninstall: uninstallAlert,
+    restore: restoreAlert,
     start: null,
-    stop: 'Players will be disconnected when the server stops.',
+    stop: stopAlert,
   },
   dependencies: {},
 })
