@@ -24,20 +24,20 @@ export const getRconCredentials = sdk.Action.withoutInput(
       }
     }
 
-    const minecraftInterface = await sdk.serviceInterface.getAllOwn(
-      effects,
-      (interfaces) => interfaces.find(i => i.id === 'minecraft-server')
-    ).once()
+    const minecraftInterface = await sdk.serviceInterface
+      .getOwn(effects, 'minecraft-server')
+      .once()
 
     let output = '# RCON Connection Details\n\n'
     output += 'Use these credentials with external RCON management tools.\n\n'
 
     if (minecraftInterface?.addressInfo) {
-      const lanHostnames = minecraftInterface.addressInfo.nonLocal.filter({ kind: ['ipv4', 'ipv6', 'domain'] }).hostnames
-      if (lanHostnames.length > 0) {
-        const host = lanHostnames[0].kind === 'ip' ? lanHostnames[0].hostname.value : lanHostnames[0].hostname
-        output += `**Host:** \`${host}\`\n\n`
-      }
+      const preferredHosts = minecraftInterface.addressInfo.nonLocal.filter({
+        visibility: 'private',
+      }).hostnames
+      const fallbackHosts = minecraftInterface.addressInfo.nonLocal.hostnames
+      const host = preferredHosts[0]?.hostname ?? fallbackHosts[0]?.hostname
+      if (host) output += `**Host:** \`${host}\`\n\n`
     }
 
     output += `**Port:** \`${rconPort}\`\n\n`
@@ -54,5 +54,5 @@ export const getRconCredentials = sdk.Action.withoutInput(
       message: output,
       result: null,
     }
-  }
+  },
 )

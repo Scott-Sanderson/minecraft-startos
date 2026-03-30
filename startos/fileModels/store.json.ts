@@ -1,4 +1,4 @@
-import { matches, FileHelper } from '@start9labs/start-sdk'
+import { z, FileHelper } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
 export const defaultGameMode = 'survival'
@@ -15,77 +15,45 @@ export type WhitelistEntry = {
   uuid?: string
 }
 
-export type StoreConfig = {
-  rconPassword?: string
-  gameMode: 'survival' | 'creative' | 'adventure' | 'spectator'
-  difficulty: 'peaceful' | 'easy' | 'normal' | 'hard'
-  memory: {
-    initial: string
-    maximum: string
-  }
-  whitelistEnabled: boolean
-  whitelist: WhitelistEntry[]
-  webAdminUsername: string
-  webAdminPassword?: string
-  motd: string
-  maxPlayers: number
-}
-
-const shape = matches.object({
-  rconPassword: matches.string.optional().onMismatch(undefined),
-  gameMode: matches
-    .literals('survival', 'creative', 'adventure', 'spectator')
-    .onMismatch(defaultGameMode),
-  difficulty: matches
-    .literals('peaceful', 'easy', 'normal', 'hard')
-    .onMismatch(defaultDifficulty),
-  memory: matches
-    .object({
-      initial: matches.string.onMismatch(defaultInitialMemory),
-      maximum: matches.string.onMismatch(defaultMaximumMemory),
-    })
-    .onMismatch({
-      initial: defaultInitialMemory,
-      maximum: defaultMaximumMemory,
-    }),
-  whitelistEnabled: matches.boolean.onMismatch(defaultWhitelistEnabled),
-  whitelist: matches
-    .arrayOf(
-      matches.object({
-        name: matches.string,
-        uuid: matches.string.optional().onMismatch(undefined),
-      }),
-    )
-    .onMismatch([]),
-  webAdminUsername: matches
-    .string
-    .onMismatch(defaultWebAdminUsername),
-  webAdminPassword: matches.string.optional().onMismatch(undefined),
-  motd: matches.string.onMismatch(defaultMotd),
-  maxPlayers: matches.number.onMismatch(defaultMaxPlayers),
+const whitelistEntrySchema = z.object({
+  name: z.string(),
+  uuid: z.string().optional().catch(undefined),
 })
+
+const memorySchema = z
+  .object({
+    initial: z.string().catch(defaultInitialMemory),
+    maximum: z.string().catch(defaultMaximumMemory),
+  })
+  .catch({
+    initial: defaultInitialMemory,
+    maximum: defaultMaximumMemory,
+  })
+
+const storeConfigSchema = z.object({
+  rconPassword: z.string().optional().catch(undefined),
+  gameMode: z
+    .enum(['survival', 'creative', 'adventure', 'spectator'])
+    .catch(defaultGameMode),
+  difficulty: z
+    .enum(['peaceful', 'easy', 'normal', 'hard'])
+    .catch(defaultDifficulty),
+  memory: memorySchema,
+  whitelistEnabled: z.boolean().catch(defaultWhitelistEnabled),
+  whitelist: z.array(whitelistEntrySchema).catch([]),
+  webAdminUsername: z.string().catch(defaultWebAdminUsername),
+  webAdminPassword: z.string().optional().catch(undefined),
+  motd: z.string().catch(defaultMotd),
+  maxPlayers: z.number().int().catch(defaultMaxPlayers),
+})
+
+export type StoreConfig = z.infer<typeof storeConfigSchema>
 
 export const storeJson = FileHelper.json(
   { base: sdk.volumes.main, subpath: 'start9/store.json' },
-  shape,
+  storeConfigSchema,
 )
 
-export const normalizeStoreConfig = (config: Partial<StoreConfig> | null): StoreConfig | null => {
-  if (!config) return null
-
-  return {
-    rconPassword: config.rconPassword ?? undefined,
-    gameMode: config.gameMode ?? defaultGameMode,
-    difficulty: config.difficulty ?? defaultDifficulty,
-    memory: {
-      initial: config.memory?.initial ?? defaultInitialMemory,
-      maximum: config.memory?.maximum ?? defaultMaximumMemory,
-    },
-    whitelistEnabled: config.whitelistEnabled ?? defaultWhitelistEnabled,
-    whitelist: config.whitelist ?? [],
-    webAdminUsername: config.webAdminUsername ?? defaultWebAdminUsername,
-    webAdminPassword: config.webAdminPassword ?? undefined,
-    motd: config.motd ?? defaultMotd,
-    maxPlayers: config.maxPlayers ?? defaultMaxPlayers,
-  }
-}
+export const normalizeStoreConfig = (
+  config: StoreConfig | null,
+): StoreConfig | null => config

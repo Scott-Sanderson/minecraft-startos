@@ -6,7 +6,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "^0.4.0-beta.46"
+    "@start9labs/start-sdk": "^0.4.0-beta.66"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",
@@ -21,7 +21,7 @@
     "singleQuote": true
   },
   "version": "1.0.0",
-  "description": "<p align=\"center\">   <img src=\"icon.png\" alt=\"Project Logo\" width=\"21%\"> </p>",
+  "description": "StartOS package for a vanilla Minecraft Java Edition server with RCON web admin.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -32,7 +32,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Scott-Sanderson/minecraft-startos/issues"

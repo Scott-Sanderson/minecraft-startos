@@ -1,6 +1,7 @@
 import { setupManifest } from '@start9labs/start-sdk'
 import { minecraftImageTag, minecraftVersion } from '../utils'
 import {
+  defaultLocale,
   installAlert,
   longDescription,
   restoreAlert,
@@ -13,7 +14,7 @@ import {
 export const manifest = setupManifest({
   id: 'minecraft',
   title: 'Minecraft Server',
-  license: 'Various',
+  license: 'Apache-2.0',
   wrapperRepo: 'https://github.com/Scott-Sanderson/minecraft-startos',
   upstreamRepo: 'https://github.com/itzg/docker-minecraft-server',
   supportSite: 'https://github.com/itzg/docker-minecraft-server/issues',
@@ -21,27 +22,31 @@ export const manifest = setupManifest({
   donationUrl: null,
   docsUrl: 'https://docker-minecraft-server.readthedocs.io/',
   description: {
-    short: shortDescription,
-    long: longDescription,
+    short: shortDescription[defaultLocale],
+    long: longDescription[defaultLocale],
   },
   volumes: ['main'],
   images: {
     'minecraft-server': {
       source: { dockerTag: `itzg/minecraft-server:${minecraftImageTag}` },
-      arch: ['aarch64'],
+      arch: ['x86_64', 'aarch64'],
     },
-    'rcon': {
+    rcon: {
       source: { dockerTag: 'itzg/rcon:latest' },
-      arch: ['aarch64'],
+      arch: ['x86_64', 'aarch64'],
+    },
+    'rcon-proxy': {
+      source: { dockerTag: 'nginx:1.27-alpine' },
+      arch: ['x86_64', 'aarch64'],
     },
   },
   alerts: {
-    install: installAlert,
-    update: updateAlert,
-    uninstall: uninstallAlert,
-    restore: restoreAlert,
+    install: installAlert[defaultLocale],
+    update: updateAlert[defaultLocale],
+    uninstall: uninstallAlert[defaultLocale],
+    restore: restoreAlert[defaultLocale],
     start: null,
-    stop: stopAlert,
+    stop: stopAlert[defaultLocale],
   },
   dependencies: {},
-})
+} as unknown as Parameters<typeof setupManifest>[0])

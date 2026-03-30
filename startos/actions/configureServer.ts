@@ -38,7 +38,8 @@ const inputSpec = InputSpec.of({
   }),
   initialMemory: Value.text({
     name: 'Initial Memory',
-    description: 'Initial Java heap size (e.g., 1G, 2G, 512M). Must be a number followed by M or G.',
+    description:
+      'Initial Java heap size (e.g., 1G, 2G, 512M). Must be a number followed by M or G.',
     required: true,
     default: defaultInitialMemory,
     placeholder: defaultInitialMemory,
@@ -46,7 +47,8 @@ const inputSpec = InputSpec.of({
   }),
   maximumMemory: Value.text({
     name: 'Maximum Memory',
-    description: 'Maximum Java heap size (e.g., 2G, 4G). Must be a number followed by M or G.',
+    description:
+      'Maximum Java heap size (e.g., 2G, 4G). Must be a number followed by M or G.',
     required: true,
     default: defaultMaximumMemory,
     placeholder: defaultMaximumMemory,
@@ -81,7 +83,8 @@ export const configureServer = sdk.Action.withInput(
   async () => ({
     name: 'Configure Server',
     description: 'Configure your Minecraft server settings',
-    warning: 'This will overwrite your current configuration. The server must be restarted for changes to take effect.',
+    warning:
+      'This will overwrite your current configuration. The server must be restarted for changes to take effect.',
     allowedStatuses: 'any',
     group: null,
     visibility: 'enabled',
@@ -92,7 +95,11 @@ export const configureServer = sdk.Action.withInput(
     if (!config) return {}
 
     return {
-      gameMode: config.gameMode as 'survival' | 'creative' | 'adventure' | 'spectator',
+      gameMode: config.gameMode as
+        | 'survival'
+        | 'creative'
+        | 'adventure'
+        | 'spectator',
       difficulty: config.difficulty as 'peaceful' | 'easy' | 'normal' | 'hard',
       initialMemory: config.memory.initial,
       maximumMemory: config.memory.maximum,
@@ -105,7 +112,11 @@ export const configureServer = sdk.Action.withInput(
     const existingConfig = normalizeStoreConfig(await storeJson.read().once())
 
     await storeJson.merge(effects, {
-      gameMode: input.gameMode as 'survival' | 'creative' | 'adventure' | 'spectator',
+      gameMode: input.gameMode as
+        | 'survival'
+        | 'creative'
+        | 'adventure'
+        | 'spectator',
       difficulty: input.difficulty as 'peaceful' | 'easy' | 'normal' | 'hard',
       memory: {
         initial: input.initialMemory,
@@ -120,8 +131,9 @@ export const configureServer = sdk.Action.withInput(
     return {
       version: '1',
       title: 'Configuration Saved',
-      message: 'Your Minecraft server has been configured successfully. Start the service to apply changes.',
+      message:
+        'Your Minecraft server has been configured successfully. Start the service to apply changes.',
       result: null,
     }
-  }
+  },
 )

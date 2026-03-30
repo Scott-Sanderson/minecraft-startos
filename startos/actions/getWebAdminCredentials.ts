@@ -26,14 +26,31 @@ export const getWebAdminCredentials = sdk.Action.withoutInput(
     return {
       version: '1',
       title: 'Web Admin Credentials',
-      message: 'Access the Web Admin UI through the "Web Admin" interface in StartOS.',
+      message:
+        'Access the Web Admin UI through the "Web Admin" interface in StartOS.',
       result: {
         type: 'group',
         value: [
-          { name: 'Username', description: null, type: 'single' as const, value: config.webAdminUsername, copyable: true, qr: false, masked: false },
-          { name: 'Password', description: null, type: 'single' as const, value: config.webAdminPassword, copyable: true, qr: false, masked: true },
+          {
+            name: 'Username',
+            description: null,
+            type: 'single' as const,
+            value: config.webAdminUsername,
+            copyable: true,
+            qr: false,
+            masked: false,
+          },
+          {
+            name: 'Password',
+            description: null,
+            type: 'single' as const,
+            value: config.webAdminPassword,
+            copyable: true,
+            qr: false,
+            masked: true,
+          },
         ],
       },
     }
-  }
+  },
 )

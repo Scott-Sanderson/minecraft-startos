@@ -1,67 +1,156 @@
 import { sdk } from '../sdk'
 import { gamePort } from '../utils'
+import type { T } from '@start9labs/start-sdk'
+
+type AddressResultMember = Extract<T.ActionResultMember, { type: 'single' }>
+
+const connectionLabel = (
+  hostname: string,
+  kind: T.HostnameMetadata['kind'],
+  index: number,
+) => {
+  switch (kind) {
+    case 'mdns':
+      return `Local Hostname ${index}`
+    case 'private-domain':
+      return `Private Domain ${index}`
+    case 'public-domain':
+      return `Public Domain ${index}`
+    case 'ipv4':
+      return `IPv4 Address ${index}`
+    case 'ipv6':
+      return `IPv6 Address ${index}`
+    case 'plugin':
+      return `Plugin Hostname ${index}`
+    default:
+      return `Address ${index}`
+  }
+}
+
+const toAddressMembers = (
+  hostnames: Array<T.HostnameInfo>,
+): Array<AddressResultMember> => {
+  const seen = new Set<string>()
+  const members: Array<AddressResultMember> = []
+
+  for (const hostname of hostnames) {
+    const address = `${hostname.hostname}:${hostname.port ?? gamePort}`
+    if (seen.has(address)) continue
+    seen.add(address)
+    members.push({
+      name: connectionLabel(
+        hostname.hostname,
+        hostname.metadata.kind,
+        members.length + 1,
+      ),
+      description: null,
+      type: 'single',
+      value: address,
+      copyable: true,
+      qr: false,
+      masked: false,
+    })
+  }
+
+  return members
+}
 
 export const getConnectionInfo = sdk.Action.withoutInput(
   'get-connection-info',
   async () => ({
     name: 'Get Connection Info',
-    description: 'Get LAN and Tor addresses for connecting to the Minecraft server',
+    description: 'Get copyable connection addresses for the Minecraft server',
     warning: null,
     allowedStatuses: 'only-running',
     group: null,
     visibility: 'enabled',
   }),
   async ({ effects }) => {
-    const minecraftInterface = await sdk.serviceInterface.getAllOwn(
-      effects,
-      (interfaces) => interfaces.find(i => i.id === 'minecraft-server')
-    ).once()
+    const [minecraftInterface, osIp, portForward] = await Promise.all([
+      sdk.serviceInterface.getOwn(effects, 'minecraft-server').once(),
+      effects.getOsIp(),
+      effects.getServicePortForward({
+        hostId: 'minecraft-multi',
+        internalPort: gamePort,
+      }),
+    ])
 
-    if (!minecraftInterface) {
-      return {
-        version: '1',
-        title: 'Error',
-        message: 'Minecraft server interface not found. Please restart the service.',
-        result: null,
-      }
+    const assignedPort = portForward.assignedPort ?? gamePort
+    const preferredAddress = `${osIp}:${assignedPort}`
+    const lanHostnames = minecraftInterface?.addressInfo
+      ? minecraftInterface.addressInfo.nonLocal.filter({
+          visibility: 'private',
+          kind: ['ip', 'domain', 'mdns'],
+        }).hostnames
+      : []
+    const publicHostnames = minecraftInterface?.addressInfo
+      ? minecraftInterface.addressInfo.nonLocal.filter({
+          visibility: 'public',
+        }).hostnames
+      : []
+
+    const lanMembers = toAddressMembers(lanHostnames)
+    const publicMembers = toAddressMembers(publicHostnames)
+
+    const resultMembers: Array<T.ActionResultMember> = [
+      {
+        name: 'Recommended Address',
+        description:
+          'Use this VM IP and assigned port first when connecting from your local network',
+        type: 'single',
+        value: preferredAddress,
+        copyable: true,
+        qr: false,
+        masked: false,
+      },
+      {
+        name: 'Host IP',
+        description: 'Current StartOS VM IP address',
+        type: 'single',
+        value: osIp,
+        copyable: true,
+        qr: false,
+        masked: false,
+      },
+      {
+        name: 'Port',
+        description: 'Current externally assigned Minecraft port',
+        type: 'single',
+        value: assignedPort.toString(),
+        copyable: true,
+        qr: false,
+        masked: false,
+      },
+    ]
+
+    if (lanMembers.length > 0) {
+      resultMembers.push({
+        name: 'Local Network Addresses',
+        description:
+          'Addresses other devices on your LAN can usually use directly',
+        type: 'group',
+        value: lanMembers,
+      })
     }
 
-    let output = '# Minecraft Server Connection Info\n\n'
-
-    if (minecraftInterface?.addressInfo) {
-      const lanHostnames = minecraftInterface.addressInfo.nonLocal.filter({ kind: ['ipv4', 'ipv6', 'domain'] }).hostnames
-      const torHostnames = minecraftInterface.addressInfo.onion.hostnames
-
-      if (lanHostnames.length > 0) {
-        output += '## LAN Addresses (Local Network)\n\n'
-        for (const h of lanHostnames) {
-          const host = h.kind === 'ip' ? h.hostname.value : h.hostname
-          output += `- \`${host}:${gamePort}\`\n`
-        }
-        output += '\n'
-      }
-
-      if (torHostnames.length > 0) {
-        output += '## Tor Address (Private)\n\n'
-        for (const h of torHostnames) {
-          output += `- \`${h.hostname}:${gamePort}\`\n`
-        }
-        output += '\n'
-      }
+    if (publicMembers.length > 0) {
+      resultMembers.push({
+        name: 'Public / Routed Addresses',
+        description: 'Addresses exposed beyond the local network, if available',
+        type: 'group',
+        value: publicMembers,
+      })
     }
-
-    output += '## How to Connect\n\n'
-    output += '1. Open Minecraft Java Edition\n'
-    output += '2. Go to "Multiplayer"\n'
-    output += '3. Click "Add Server"\n'
-    output += '4. Enter one of the addresses above (with port)\n'
-    output += '5. Click "Done" and connect to your server\n'
 
     return {
       version: '1',
       title: 'Connection Information',
-      message: output,
-      result: null,
+      message:
+        'Use one of the copyable addresses below in Minecraft Java Edition multiplayer.',
+      result: {
+        type: 'group',
+        value: resultMembers,
+      },
     }
-  }
+  },
 )

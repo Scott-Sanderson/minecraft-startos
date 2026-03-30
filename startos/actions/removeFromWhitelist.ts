@@ -39,7 +39,9 @@ export const removeFromWhitelist = sdk.Action.withInput(
     }
 
     // Check if player exists
-    const existingPlayer = currentConfig.whitelist.find(p => p.name === input.name)
+    const existingPlayer = currentConfig.whitelist.find(
+      (p) => p.name === input.name,
+    )
     if (!existingPlayer) {
       return {
         version: '1',
@@ -50,7 +52,9 @@ export const removeFromWhitelist = sdk.Action.withInput(
     }
 
     // Remove player from whitelist
-    const updatedWhitelist = currentConfig.whitelist.filter(p => p.name !== input.name)
+    const updatedWhitelist = currentConfig.whitelist.filter(
+      (p) => p.name !== input.name,
+    )
 
     await storeJson.merge(effects, {
       whitelist: updatedWhitelist,
@@ -68,5 +72,5 @@ export const removeFromWhitelist = sdk.Action.withInput(
         masked: false,
       },
     }
-  }
+  },
 )

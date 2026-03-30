@@ -3,11 +3,11 @@
 > **Upstream docs:** <https://docker-minecraft-server.readthedocs.io/>
 >
 > Everything not listed in this document should behave the same as upstream
-> `itzg/minecraft-server` `1.21.11`. If a feature, setting, or behavior is not
+> `itzg/minecraft-server` `26.1`. If a feature, setting, or behavior is not
 > mentioned here, the upstream documentation is the source of truth.
 
 StartOS package for a vanilla Minecraft Java Edition server with an included
-RCON web admin sidecar. The package wraps the upstream `java21` image variant,
+RCON web admin sidecar. The package wraps the upstream `java25` image variant,
 pins the Minecraft server version at runtime, and exposes both the game server
 and browser-based admin access through StartOS interfaces and actions.
 
@@ -32,15 +32,16 @@ and browser-based admin access through StartOS interfaces and actions.
 
 ## Image and Container Runtime
 
-- Primary server image: `itzg/minecraft-server:java21`
+- Primary server image: `itzg/minecraft-server:java25`
 - Admin image: `itzg/rcon:latest`
 - Container startup uses the upstream image entrypoints via `sdk.useEntrypoint()`
 - The package currently builds through StartOS package tooling rather than a custom Dockerfile
 
-The package runs two containers:
+The package runs three containers:
 
 - `minecraft-server`: the actual Java Edition game server
 - `rcon-admin`: the browser-based RCON web admin interface
+- `rcon-proxy`: an nginx reverse proxy that fronts the web admin UI and websocket endpoint
 
 ---
 
@@ -127,7 +128,7 @@ The package exposes two StartOS interfaces.
 - Purpose: browser-based RCON administration
 - Interface type: `ui`
 - Protocol: HTTP
-- Internal port: `4326`
+- Internal port: `8080`
 - Access methods: StartOS interface links and assigned hostnames
 
 ### Minecraft Server
@@ -236,7 +237,7 @@ Restore behavior currently relies on the normal volume restore path and does not
 
 ## Health Checks
 
-The package defines daemon readiness checks for both containers.
+The package defines daemon readiness checks for all three daemons.
 
 ### Minecraft Server
 
@@ -252,6 +253,13 @@ The package defines daemon readiness checks for both containers.
 - Success message: `Web admin is ready`
 - Failure message: `Web admin is not ready`
 
+### RCON Web Admin Proxy
+
+- Method: TCP port listening check
+- Port: `8080`
+- Success message: `Web admin proxy is ready`
+- Failure message: `Web admin proxy is not ready`
+
 There are currently no standalone health checks beyond daemon readiness.
 
 ---
@@ -262,7 +270,7 @@ There are currently no standalone health checks beyond daemon readiness.
 2. The package currently writes `whitelist.json` from package state, but more advanced whitelist or ops workflows performed directly through upstream tooling may not be reflected back into StartOS action state.
 3. The package does not yet expose every upstream `itzg/minecraft-server` option through StartOS actions.
 4. The current multi-daemon startup ordering is intentionally relaxed because older StartOS prereleases rejected the SDK’s intermediate dependency health state.
-5. The package is currently pinned to `aarch64` in the manifest and has not yet been re-expanded or validated for additional architectures.
+5. The package declares support for `x86_64` and `aarch64`, but does not currently target `riscv64`.
 
 ---
 
@@ -285,11 +293,12 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for local development, build, and insta
 
 ```yaml
 package_id: minecraft
-upstream_version: 1.21.11
+upstream_version: 26.1
 image:
-  minecraft_server: itzg/minecraft-server:java21
+  minecraft_server: itzg/minecraft-server:java25
   rcon_admin: itzg/rcon:latest
 architectures:
+  - x86_64
   - aarch64
 volumes:
   main:
@@ -300,7 +309,8 @@ volumes:
       - whitelist.json
 ports:
   minecraft_server: 25565
-  web_admin: 4326
+  web_admin: 8080
+  web_admin_upstream: 4326
 dependencies: none
 startos_managed_env_vars:
   - EULA
