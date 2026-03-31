@@ -1,12 +1,69 @@
-import { sdk } from '../sdk'
+import type { T } from '@start9labs/start-sdk'
 import { normalizeStoreConfig, storeJson } from '../fileModels/store.json'
-import { rconPort } from '../utils'
+import { sdk } from '../sdk'
+
+type SingleResultMember = Extract<T.ActionResultMember, { type: 'single' }>
+
+const internalGatewayIds = new Set(['lo', 'lxcbr0'])
+
+const pickLocalIpAddress = (
+  hostnames: Array<T.HostnameInfo>,
+): string | null => {
+  const ipv4Hostnames = hostnames.filter(
+    (hostname) => hostname.metadata.kind === 'ipv4',
+  )
+
+  const preferredHostname = ipv4Hostnames.find((hostname) => {
+    const metadata = hostname.metadata
+    return 'gateway' in metadata && !internalGatewayIds.has(metadata.gateway)
+  })
+
+  return preferredHostname?.hostname ?? ipv4Hostnames[0]?.hostname ?? null
+}
+
+const credentialsResult = ({
+  localIpAddress,
+  username,
+  password,
+}: {
+  localIpAddress: string
+  username: string
+  password: string
+}): Array<SingleResultMember> => [
+  {
+    name: 'Local IP Address',
+    description: null,
+    type: 'single',
+    value: localIpAddress,
+    copyable: true,
+    qr: false,
+    masked: false,
+  },
+  {
+    name: 'Username',
+    description: null,
+    type: 'single',
+    value: username,
+    copyable: true,
+    qr: false,
+    masked: false,
+  },
+  {
+    name: 'Password',
+    description: null,
+    type: 'single',
+    value: password,
+    copyable: true,
+    qr: false,
+    masked: true,
+  },
+]
 
 export const getRconCredentials = sdk.Action.withoutInput(
   'get-rcon-credentials',
   async () => ({
     name: 'Get RCON Credentials',
-    description: 'Get RCON connection details for external management tools',
+    description: 'Get the local login details for the bundled RCON admin tools',
     warning: null,
     allowedStatuses: 'only-running',
     group: null,
@@ -15,7 +72,7 @@ export const getRconCredentials = sdk.Action.withoutInput(
   async ({ effects }) => {
     const config = normalizeStoreConfig(await storeJson.read().once())
 
-    if (!config || !config.rconPassword) {
+    if (!config?.webAdminPassword) {
       return {
         version: '1',
         title: 'Error',
@@ -28,31 +85,36 @@ export const getRconCredentials = sdk.Action.withoutInput(
       .getOwn(effects, 'minecraft-server')
       .once()
 
-    let output = '# RCON Connection Details\n\n'
-    output += 'Use these credentials with external RCON management tools.\n\n'
+    const privateHostnames = minecraftInterface?.addressInfo
+      ? minecraftInterface.addressInfo.nonLocal.filter({
+          visibility: 'private',
+          kind: ['ip'],
+        }).hostnames
+      : []
 
-    if (minecraftInterface?.addressInfo) {
-      const preferredHosts = minecraftInterface.addressInfo.nonLocal.filter({
-        visibility: 'private',
-      }).hostnames
-      const fallbackHosts = minecraftInterface.addressInfo.nonLocal.hostnames
-      const host = preferredHosts[0]?.hostname ?? fallbackHosts[0]?.hostname
-      if (host) output += `**Host:** \`${host}\`\n\n`
+    const localIpAddress = pickLocalIpAddress(privateHostnames)
+
+    if (!localIpAddress) {
+      return {
+        version: '1',
+        title: 'Error',
+        message: 'A local IP address is not available yet. Please try again.',
+        result: null,
+      }
     }
-
-    output += `**Port:** \`${rconPort}\`\n\n`
-    output += `**Password:** \`${config.rconPassword}\`\n\n`
-    output += '---\n\n'
-    output += 'Popular RCON tools:\n'
-    output += '- mcrcon (command line)\n'
-    output += '- Minecraft RCON Console (desktop app)\n'
-    output += '- Or use the built-in Web Admin UI\n'
 
     return {
       version: '1',
       title: 'RCON Credentials',
-      message: output,
-      result: null,
+      message: 'Use the copyable values below.',
+      result: {
+        type: 'group',
+        value: credentialsResult({
+          localIpAddress,
+          username: config.webAdminUsername,
+          password: config.webAdminPassword,
+        }),
+      },
     }
   },
 )

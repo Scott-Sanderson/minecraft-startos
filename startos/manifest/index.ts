@@ -32,7 +32,7 @@ export const manifest = setupManifest({
       arch: ['x86_64', 'aarch64'],
     },
     rcon: {
-      source: { dockerTag: 'itzg/rcon:latest' },
+      source: { dockerBuild: { dockerfile: './rcon.Dockerfile' } },
       arch: ['x86_64', 'aarch64'],
     },
     'rcon-proxy': {

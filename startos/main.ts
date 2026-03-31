@@ -10,6 +10,8 @@ import {
 import { normalizeStoreConfig, storeJson } from './fileModels/store.json'
 import { writeFile } from 'fs/promises'
 
+const rconWebAdminDbPath = '/opt/rcon-web-admin-0.14.1/db'
+
 const proxyConfig = ({
   proxyPort,
   upstreamPort,
@@ -29,12 +31,22 @@ server {
     return 200 '{"port":${websocketPort},"sslUrl":"wss://$http_host/ws","url":"ws://$http_host/ws"}';
   }
 
-  location /ws {
-    proxy_pass http://127.0.0.1:${websocketPort};
+  location = /ws {
+    proxy_pass http://127.0.0.1:${websocketPort}/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
     proxy_set_header Host $http_host;
+    proxy_buffering off;
+  }
+
+  location /ws/ {
+    proxy_pass http://127.0.0.1:${websocketPort}/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $http_host;
+    proxy_buffering off;
   }
 
   location / {
@@ -82,7 +94,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     sdk.Mounts.of().mountVolume({
       volumeId: 'main',
       subpath: 'rcon-db',
-      mountpoint: '/opt/rcon/db',
+      mountpoint: rconWebAdminDbPath,
       readonly: false,
     }),
     'rcon-sub',

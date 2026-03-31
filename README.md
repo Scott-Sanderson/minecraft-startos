@@ -33,7 +33,7 @@ and browser-based admin access through StartOS interfaces and actions.
 ## Image and Container Runtime
 
 - Primary server image: `itzg/minecraft-server:java25`
-- Admin image: `itzg/rcon:latest`
+- Admin image: package-built `rcon` image derived from `itzg/rcon:latest`
 - Container startup uses the upstream image entrypoints via `sdk.useEntrypoint()`
 - The package currently builds through StartOS package tooling rather than a custom Dockerfile
 
@@ -175,11 +175,11 @@ RCON itself is not exposed as a separate StartOS interface. The package surfaces
 ### `get-rcon-credentials`
 
 - Name: Get RCON Credentials
-- Purpose: expose the generated RCON password and port
+- Purpose: show the local IP address plus the bundled RCON admin username and password
 - Visibility: enabled
 - Availability: only running
 - Inputs: none
-- Outputs: markdown credentials
+- Outputs: structured copyable credentials
 
 ### `get-web-admin-credentials`
 
@@ -266,7 +266,7 @@ There are currently no standalone health checks beyond daemon readiness.
 
 ## Limitations and Differences
 
-1. The package currently uses `itzg/rcon:latest`, so the admin sidecar is not pinned as tightly as the main Minecraft image.
+1. The package builds its `rcon` sidecar from `itzg/rcon:latest` using `rcon.Dockerfile` so the StartOS-specific fixes are versioned in this repo instead of applied at runtime.
 2. The package currently writes `whitelist.json` from package state, but more advanced whitelist or ops workflows performed directly through upstream tooling may not be reflected back into StartOS action state.
 3. The package does not yet expose every upstream `itzg/minecraft-server` option through StartOS actions.
 4. The current multi-daemon startup ordering is intentionally relaxed because older StartOS prereleases rejected the SDK’s intermediate dependency health state.
@@ -296,7 +296,7 @@ package_id: minecraft
 upstream_version: 26.1
 image:
   minecraft_server: itzg/minecraft-server:java25
-  rcon_admin: itzg/rcon:latest
+  rcon_admin: package-built rcon image (base: itzg/rcon:latest)
 architectures:
   - x86_64
   - aarch64
