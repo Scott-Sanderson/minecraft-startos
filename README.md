@@ -33,7 +33,7 @@ and browser-based admin access through StartOS interfaces and actions.
 ## Image and Container Runtime
 
 - Primary server image: `itzg/minecraft-server:java25`
-- Admin image: package-built `rcon` image derived from `itzg/rcon:latest`
+- Admin image: package-built `rcon` image derived from pinned `itzg/rcon@sha256:c9521f333bf9eaedf2db0acd750e67be88eaaa9c5e9026385bd875dc18a49110`
 - Container startup uses the upstream image entrypoints via `sdk.useEntrypoint()`
 - The package currently builds through StartOS package tooling rather than a custom Dockerfile
 
@@ -266,7 +266,7 @@ There are currently no standalone health checks beyond daemon readiness.
 
 ## Limitations and Differences
 
-1. The package builds its `rcon` sidecar from `itzg/rcon:latest` using `rcon.Dockerfile` so the StartOS-specific fixes are versioned in this repo instead of applied at runtime.
+1. The package builds its `rcon` sidecar from a pinned upstream `itzg/rcon` digest using `rcon.Dockerfile` so the StartOS-specific fixes are versioned in this repo and rebuilds do not drift unexpectedly.
 2. The package currently writes `whitelist.json` from package state, but more advanced whitelist or ops workflows performed directly through upstream tooling may not be reflected back into StartOS action state.
 3. The package does not yet expose every upstream `itzg/minecraft-server` option through StartOS actions.
 4. The current multi-daemon startup ordering is intentionally relaxed because older StartOS prereleases rejected the SDK’s intermediate dependency health state.
@@ -296,14 +296,14 @@ package_id: minecraft
 upstream_version: 26.1
 image:
   minecraft_server: itzg/minecraft-server:java25
-  rcon_admin: package-built rcon image (base: itzg/rcon:latest)
+  rcon_admin: package-built rcon image (base: itzg/rcon@sha256:c9521f333bf9eaedf2db0acd750e67be88eaaa9c5e9026385bd875dc18a49110)
 architectures:
   - x86_64
   - aarch64
 volumes:
   main:
     minecraft_server: /data
-    rcon_admin: /opt/rcon/db
+    rcon_admin: /opt/rcon-web-admin-0.14.1/db
     startos_files:
       - start9/store.json
       - whitelist.json
