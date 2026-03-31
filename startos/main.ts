@@ -11,7 +11,25 @@ import { normalizeStoreConfig, storeJson } from './fileModels/store.json'
 import { writeFile } from 'fs/promises'
 
 const rconWebAdminDbPath = '/opt/rcon-web-admin-0.14.1/db'
-const minecraftStartupGracePeriod = 15_000
+const minecraftInitialHealthCheckDelay = 5_000
+const minecraftHealthGracePeriod = 30_000
+
+const delayFirstHealthCheck: typeof sdk.trigger.defaultTrigger =
+  async function* (getInput) {
+    await new Promise((resolve) =>
+      setTimeout(resolve, minecraftInitialHealthCheckDelay),
+    )
+    yield
+
+    const defaultTrigger = sdk.trigger.defaultTrigger(getInput)
+    for (
+      let result = await defaultTrigger.next();
+      !result.done;
+      result = await defaultTrigger.next()
+    ) {
+      yield result.value
+    }
+  }
 
 const proxyConfig = ({
   proxyPort,
@@ -62,7 +80,6 @@ server {
 
 export const main = sdk.setupMain(async ({ effects }) => {
   const config = normalizeStoreConfig(await storeJson.read().const(effects))
-  const minecraftHealthStartedAt = Date.now()
 
   if (!config || !config.rconPassword || !config.webAdminPassword) {
     throw new Error('Configuration not found. Please restart the service.')
@@ -141,27 +158,13 @@ export const main = sdk.setupMain(async ({ effects }) => {
       },
       ready: {
         display: 'Minecraft Server',
-        gracePeriod: minecraftStartupGracePeriod,
-        fn: async () => {
-          const result = await sdk.healthCheck.checkPortListening(effects, gamePort, {
+        gracePeriod: minecraftHealthGracePeriod,
+        trigger: delayFirstHealthCheck,
+        fn: () =>
+          sdk.healthCheck.checkPortListening(effects, gamePort, {
             successMessage: 'Minecraft server is ready',
             errorMessage: 'Minecraft server is not ready',
-          })
-
-          if (result.result !== 'success') {
-            const withinStartupGrace =
-              Date.now() - minecraftHealthStartedAt <= minecraftStartupGracePeriod
-
-            if (withinStartupGrace) {
-              return {
-                result: 'starting',
-                message: 'Minecraft server is starting...',
-              }
-            }
-          }
-
-          return result
-        },
+          }),
       },
       requires: [],
     })
