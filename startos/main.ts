@@ -189,9 +189,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
             errorMessage: 'Web admin is not ready',
           }),
       },
-      // StartOS 0.4.0-alpha.16 rejects the SDK's intermediate "waiting"
-      // health state for daemon dependencies, so we avoid dependency gating
-      // here and let the web admin's own readiness check settle naturally.
       requires: [],
     })
     .addDaemon('rcon-proxy', {

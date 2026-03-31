@@ -15,12 +15,11 @@ export const manifest = setupManifest({
   id: 'minecraft',
   title: 'Minecraft Server',
   license: 'Apache-2.0',
-  wrapperRepo: 'https://github.com/Scott-Sanderson/minecraft-startos',
+  packageRepo: 'https://github.com/Scott-Sanderson/minecraft-startos',
   upstreamRepo: 'https://github.com/itzg/docker-minecraft-server',
-  supportSite: 'https://github.com/itzg/docker-minecraft-server/issues',
-  marketingSite: 'https://www.minecraft.net/',
+  marketingUrl: 'https://www.minecraft.net/',
   donationUrl: null,
-  docsUrl: 'https://docker-minecraft-server.readthedocs.io/',
+  docsUrls: ['https://minecraft.wiki/w/Commands'],
   description: {
     short: shortDescription[defaultLocale],
     long: longDescription[defaultLocale],
@@ -49,4 +48,4 @@ export const manifest = setupManifest({
     stop: stopAlert[defaultLocale],
   },
   dependencies: {},
-} as unknown as Parameters<typeof setupManifest>[0])
+})
