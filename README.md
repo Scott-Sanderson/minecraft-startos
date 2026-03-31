@@ -166,11 +166,11 @@ RCON itself is not exposed as a separate StartOS interface. The package surfaces
 ### `get-connection-info`
 
 - Name: Get Connection Info
-- Purpose: show LAN and Tor addresses for joining the server
+- Purpose: show the primary copyable server address for joining the server
 - Visibility: enabled
 - Availability: only running
 - Inputs: none
-- Outputs: markdown instructions and addresses
+- Outputs: structured copyable server address
 
 ### `get-rcon-credentials`
 
