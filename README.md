@@ -11,6 +11,9 @@ RCON web admin sidecar. The package wraps the upstream `java25` image variant,
 pins the Minecraft server version at runtime, and exposes both the game server
 and browser-based admin access through StartOS interfaces and actions.
 
+This wrapper repository is MIT licensed. The packaged upstream service and
+its StartOS manifest metadata continue to track the upstream service license.
+
 ---
 
 ## Table of Contents
