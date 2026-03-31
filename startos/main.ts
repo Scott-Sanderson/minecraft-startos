@@ -11,6 +11,7 @@ import { normalizeStoreConfig, storeJson } from './fileModels/store.json'
 import { writeFile } from 'fs/promises'
 
 const rconWebAdminDbPath = '/opt/rcon-web-admin-0.14.1/db'
+const minecraftStartupGracePeriod = 15_000
 
 const proxyConfig = ({
   proxyPort,
@@ -61,6 +62,7 @@ server {
 
 export const main = sdk.setupMain(async ({ effects }) => {
   const config = normalizeStoreConfig(await storeJson.read().const(effects))
+  const minecraftHealthStartedAt = Date.now()
 
   if (!config || !config.rconPassword || !config.webAdminPassword) {
     throw new Error('Configuration not found. Please restart the service.')
@@ -139,11 +141,27 @@ export const main = sdk.setupMain(async ({ effects }) => {
       },
       ready: {
         display: 'Minecraft Server',
-        fn: () =>
-          sdk.healthCheck.checkPortListening(effects, gamePort, {
+        gracePeriod: minecraftStartupGracePeriod,
+        fn: async () => {
+          const result = await sdk.healthCheck.checkPortListening(effects, gamePort, {
             successMessage: 'Minecraft server is ready',
             errorMessage: 'Minecraft server is not ready',
-          }),
+          })
+
+          if (result.result !== 'success') {
+            const withinStartupGrace =
+              Date.now() - minecraftHealthStartedAt <= minecraftStartupGracePeriod
+
+            if (withinStartupGrace) {
+              return {
+                result: 'starting',
+                message: 'Minecraft server is starting...',
+              }
+            }
+          }
+
+          return result
+        },
       },
       requires: [],
     })
