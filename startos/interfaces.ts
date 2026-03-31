@@ -1,20 +1,27 @@
 import { sdk } from './sdk'
-import { gamePort, webAdminPort } from './utils'
+import { gamePort, webAdminProxyPort } from './utils'
+import {
+  defaultWebAdminUsername,
+  normalizeStoreConfig,
+  storeJson,
+} from './fileModels/store.json'
 
 export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
+  const config = normalizeStoreConfig(await storeJson.read().const(effects))
+
   // Web Admin Interface
   const webAdminMulti = sdk.MultiHost.of(effects, 'web-admin-multi')
-  const webAdminOrigin = await webAdminMulti.bindPort(webAdminPort, {
+  const webAdminOrigin = await webAdminMulti.bindPort(webAdminProxyPort, {
     protocol: 'http',
   })
   const webAdminInterface = sdk.createInterface(effects, {
-    name: 'Web Admin',
+    name: 'RCON Web Admin',
     id: 'web-admin',
     description: 'RCON-based web administration interface',
     type: 'ui',
     masked: false,
     schemeOverride: null,
-    username: null,
+    username: config?.webAdminUsername ?? defaultWebAdminUsername,
     path: '',
     query: {},
   })
@@ -26,7 +33,7 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     protocol: null,
     preferredExternalPort: gamePort,
     addSsl: null,
-    secure: null,
+    secure: { ssl: false },
   })
   const minecraftInterface = sdk.createInterface(effects, {
     name: 'Minecraft Server',

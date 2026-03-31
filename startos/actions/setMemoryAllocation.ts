@@ -1,5 +1,10 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import {
+  defaultInitialMemory,
+  defaultMaximumMemory,
+  normalizeStoreConfig,
+  storeJson,
+} from '../fileModels/store.json'
 
 const { InputSpec, Value } = sdk
 
@@ -8,16 +13,16 @@ const inputSpec = InputSpec.of({
     name: 'Initial Memory',
     description: 'Initial heap size (e.g., "1G", "512M")',
     required: true,
-    default: '1G',
-    placeholder: '1G',
+    default: defaultInitialMemory,
+    placeholder: defaultInitialMemory,
     masked: false,
   }),
   maximum: Value.text({
     name: 'Maximum Memory',
     description: 'Maximum heap size (e.g., "2G", "4G")',
     required: true,
-    default: '2G',
-    placeholder: '2G',
+    default: defaultMaximumMemory,
+    placeholder: defaultMaximumMemory,
     masked: false,
   }),
 })
@@ -26,7 +31,8 @@ export const setMemoryAllocation = sdk.Action.withInput(
   'set-memory-allocation',
   async () => ({
     name: 'Set Memory Allocation',
-    description: 'Configure initial and maximum memory for the Minecraft server (requires restart)',
+    description:
+      'Configure initial and maximum memory for the Minecraft server (requires restart)',
     warning: 'The server will restart to apply these changes.',
     allowedStatuses: 'any',
     group: null,
@@ -34,14 +40,16 @@ export const setMemoryAllocation = sdk.Action.withInput(
   }),
   inputSpec,
   async ({ effects }) => {
-    const config = await storeJson.read().once()
-    return config ? {
-      initial: config.memory.initial,
-      maximum: config.memory.maximum,
-    } : undefined
+    const config = normalizeStoreConfig(await storeJson.read().once())
+    return config
+      ? {
+          initial: config.memory.initial,
+          maximum: config.memory.maximum,
+        }
+      : undefined
   },
   async ({ effects, input }) => {
-    const currentConfig = await storeJson.read().once()
+    const currentConfig = normalizeStoreConfig(await storeJson.read().once())
 
     if (!currentConfig) {
       return {
@@ -52,8 +60,7 @@ export const setMemoryAllocation = sdk.Action.withInput(
       }
     }
 
-    await storeJson.write(effects, {
-      ...currentConfig,
+    await storeJson.merge(effects, {
       memory: {
         initial: input.initial,
         maximum: input.maximum,
@@ -67,10 +74,26 @@ export const setMemoryAllocation = sdk.Action.withInput(
       result: {
         type: 'group',
         value: [
-          { name: 'Initial Memory', description: null, type: 'single' as const, value: input.initial, copyable: false, qr: false, masked: false },
-          { name: 'Maximum Memory', description: null, type: 'single' as const, value: input.maximum, copyable: false, qr: false, masked: false },
+          {
+            name: 'Initial Memory',
+            description: null,
+            type: 'single' as const,
+            value: input.initial,
+            copyable: false,
+            qr: false,
+            masked: false,
+          },
+          {
+            name: 'Maximum Memory',
+            description: null,
+            type: 'single' as const,
+            value: input.maximum,
+            copyable: false,
+            qr: false,
+            masked: false,
+          },
         ],
       },
     }
-  }
+  },
 )

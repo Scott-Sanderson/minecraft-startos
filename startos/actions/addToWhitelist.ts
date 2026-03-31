@@ -1,5 +1,5 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import { normalizeStoreConfig, storeJson } from '../fileModels/store.json'
 
 const { InputSpec, Value } = sdk
 
@@ -35,7 +35,7 @@ export const addToWhitelist = sdk.Action.withInput(
   inputSpec,
   async () => undefined,
   async ({ effects, input }) => {
-    const currentConfig = await storeJson.read().once()
+    const currentConfig = normalizeStoreConfig(await storeJson.read().once())
 
     if (!currentConfig) {
       return {
@@ -47,7 +47,9 @@ export const addToWhitelist = sdk.Action.withInput(
     }
 
     // Check if player already exists
-    const existingPlayer = currentConfig.whitelist.find(p => p.name === input.name)
+    const existingPlayer = currentConfig.whitelist.find(
+      (p) => p.name === input.name,
+    )
     if (existingPlayer) {
       return {
         version: '1',
@@ -63,8 +65,7 @@ export const addToWhitelist = sdk.Action.withInput(
       { name: input.name, uuid: input.uuid || undefined },
     ]
 
-    await storeJson.write(effects, {
-      ...currentConfig,
+    await storeJson.merge(effects, {
       whitelist: updatedWhitelist,
       whitelistEnabled: true,
     })
@@ -72,14 +73,35 @@ export const addToWhitelist = sdk.Action.withInput(
     return {
       version: '1',
       title: 'Player Added to Whitelist',
-      message: 'The server will restart to apply the whitelist changes. Whitelist has been automatically enabled.',
+      message:
+        'The server will restart to apply the whitelist changes. Whitelist has been automatically enabled.',
       result: {
         type: 'group',
         value: [
-          { name: 'Player Name', description: null, type: 'single' as const, value: input.name, copyable: false, qr: false, masked: false },
-          ...(input.uuid ? [{ name: 'Player UUID', description: null, type: 'single' as const, value: input.uuid, copyable: false, qr: false, masked: false }] : []),
+          {
+            name: 'Player Name',
+            description: null,
+            type: 'single' as const,
+            value: input.name,
+            copyable: false,
+            qr: false,
+            masked: false,
+          },
+          ...(input.uuid
+            ? [
+                {
+                  name: 'Player UUID',
+                  description: null,
+                  type: 'single' as const,
+                  value: input.uuid,
+                  copyable: false,
+                  qr: false,
+                  masked: false,
+                },
+              ]
+            : []),
         ],
       },
     }
-  }
+  },
 )
