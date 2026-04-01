@@ -25,7 +25,7 @@ export const getConnectionInfo = sdk.Action.withoutInput(
     description: 'Get the best copyable server address for Minecraft',
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: '\u00A0Info',
     visibility: 'enabled',
   }),
   async ({ effects }) => {

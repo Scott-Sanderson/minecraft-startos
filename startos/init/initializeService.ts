@@ -3,7 +3,7 @@ import { sdk } from '../sdk'
 import { storeJson } from '../fileModels/store.json'
 import { configureServer } from '../actions/configureServer'
 import { getConnectionInfo } from '../actions/getConnectionInfo'
-import { getRconCredentials } from '../actions/getRconCredentials'
+import { getWebAdminCredentials } from '../actions/getWebAdminCredentials'
 
 export const initializeService = sdk.setupOnInit(async (effects, kind) => {
   if (!kind) return
@@ -31,9 +31,9 @@ export const initializeService = sdk.setupOnInit(async (effects, kind) => {
     },
   )
 
-  await sdk.action.createOwnTask(effects, getRconCredentials, 'important', {
-    reason: 'Retrieve your RCON web admin credentials',
-    replayId: 'minecraft-rcon-credentials',
+  await sdk.action.createOwnTask(effects, getWebAdminCredentials, 'important', {
+    reason: 'Retrieve your web admin credentials',
+    replayId: 'minecraft-web-admin-credentials',
   })
 
   await sdk.action.createOwnTask(effects, getConnectionInfo, 'optional', {

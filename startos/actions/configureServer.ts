@@ -86,7 +86,7 @@ export const configureServer = sdk.Action.withInput(
     warning:
       'This will overwrite your current configuration. The server must be restarted for changes to take effect.',
     allowedStatuses: 'any',
-    group: null,
+    group: 'Setup',
     visibility: 'enabled',
   }),
   inputSpec,

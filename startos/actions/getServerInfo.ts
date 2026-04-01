@@ -8,7 +8,7 @@ export const getServerInfo = sdk.Action.withoutInput(
     description: 'Display current server configuration and settings',
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: '\u00A0Info',
     visibility: 'enabled',
   }),
   async ({ effects }) => {

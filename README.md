@@ -157,6 +157,15 @@ RCON itself is not exposed as a separate StartOS interface. The package surfaces
 - Inputs: game mode, difficulty, initial memory, maximum memory, max players, MOTD, whitelist enabled
 - Outputs: confirmation only
 
+### `get-web-admin-credentials`
+
+- Name: Get Web Admin Credentials
+- Purpose: expose the generated web admin login credentials
+- Visibility: enabled
+- Availability: only running
+- Inputs: none
+- Outputs: grouped username/password result
+
 ### `get-server-info`
 
 - Name: Get Server Info
@@ -183,33 +192,6 @@ RCON itself is not exposed as a separate StartOS interface. The package surfaces
 - Availability: only running
 - Inputs: none
 - Outputs: structured copyable server address
-
-### `get-rcon-credentials`
-
-- Name: Get RCON Credentials
-- Purpose: show the local IP address plus the bundled RCON admin username and password
-- Visibility: enabled
-- Availability: only running
-- Inputs: none
-- Outputs: structured copyable credentials
-
-### `get-web-admin-credentials`
-
-- Name: Get Web Admin Credentials
-- Purpose: expose the generated web admin login credentials
-- Visibility: enabled
-- Availability: only running
-- Inputs: none
-- Outputs: grouped username/password result
-
-### `set-memory-allocation`
-
-- Name: Set Memory Allocation
-- Purpose: adjust Java heap sizing
-- Visibility: enabled
-- Availability: any
-- Inputs: initial memory, maximum memory
-- Outputs: confirmation plus resulting values
 
 ### `add-to-whitelist`
 
@@ -350,9 +332,7 @@ actions:
   - get-server-info
   - get-live-server-stats
   - get-connection-info
-  - get-rcon-credentials
   - get-web-admin-credentials
-  - set-memory-allocation
   - add-to-whitelist
   - remove-from-whitelist
 ```

@@ -311,7 +311,7 @@ export const getLiveServerStats = sdk.Action.withoutInput(
     description: 'Show live player and world stats from the running server',
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: '\u00A0Info',
     visibility: 'enabled',
   }),
   async ({ effects }) => {
