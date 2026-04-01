@@ -166,6 +166,15 @@ RCON itself is not exposed as a separate StartOS interface. The package surfaces
 - Inputs: none
 - Outputs: grouped status summary
 
+### `get-live-server-stats`
+
+- Name: Get Live Server Stats
+- Purpose: query live server/player world state over RCON and show real-time stats
+- Visibility: enabled
+- Availability: only running
+- Inputs: none
+- Outputs: grouped status summary including players and day/time (with sun/moon + moon phase)
+
 ### `get-connection-info`
 
 - Name: Get Connection Info
@@ -339,6 +348,7 @@ startos_managed_env_vars:
 actions:
   - configure-server
   - get-server-info
+  - get-live-server-stats
   - get-connection-info
   - get-rcon-credentials
   - get-web-admin-credentials
