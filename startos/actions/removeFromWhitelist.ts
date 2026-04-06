@@ -18,7 +18,8 @@ export const removeFromWhitelist = sdk.Action.withInput(
   'remove-from-whitelist',
   async () => ({
     name: 'Remove from Whitelist',
-    description: 'Remove a player from the server whitelist (requires restart)',
+    description:
+      'Remove a player from the server whitelist (requires restart). If the last player is removed, whitelist is auto-disabled.',
     warning: 'The server will restart to apply whitelist changes.',
     allowedStatuses: 'any',
     group: '\u200bWhitelist',
@@ -55,15 +56,22 @@ export const removeFromWhitelist = sdk.Action.withInput(
     const updatedWhitelist = currentConfig.whitelist.filter(
       (p) => p.name !== input.name,
     )
+    const shouldDisableWhitelist =
+      currentConfig.whitelistEnabled && updatedWhitelist.length === 0
 
     await storeJson.merge(effects, {
       whitelist: updatedWhitelist,
+      whitelistEnabled: shouldDisableWhitelist
+        ? false
+        : currentConfig.whitelistEnabled,
     })
 
     return {
       version: '1',
       title: 'Player Removed from Whitelist',
-      message: 'The server will restart to apply the whitelist changes.',
+      message: shouldDisableWhitelist
+        ? 'The server will restart to apply the whitelist changes. Whitelist was automatically disabled because no players remain.'
+        : 'The server will restart to apply the whitelist changes.',
       result: {
         type: 'single',
         value: `${input.name} has been removed from the whitelist.`,
