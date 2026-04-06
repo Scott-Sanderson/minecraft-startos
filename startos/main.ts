@@ -160,11 +160,25 @@ export const main = sdk.setupMain(async ({ effects }) => {
         display: 'Minecraft Server',
         gracePeriod: minecraftHealthGracePeriod,
         trigger: delayFirstHealthCheck,
-        fn: () =>
-          sdk.healthCheck.checkPortListening(effects, gamePort, {
+        fn: async () => {
+          const minecraftStatus = await sdk.healthCheck.checkPortListening(
+            effects,
+            gamePort,
+            {
+              successMessage: 'Minecraft server is ready',
+              errorMessage: 'Minecraft server is not ready',
+            },
+          )
+
+          if (minecraftStatus.result !== 'success') {
+            return minecraftStatus
+          }
+
+          return sdk.healthCheck.checkPortListening(effects, rconPort, {
             successMessage: 'Minecraft server is ready',
-            errorMessage: 'Minecraft server is not ready',
-          }),
+            errorMessage: 'Minecraft server is ready, waiting for RCON',
+          })
+        },
       },
       requires: [],
     })
@@ -189,7 +203,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
             errorMessage: 'Web admin is not ready',
           }),
       },
-      requires: [],
+      requires: ['minecraft-server'],
     })
     .addDaemon('rcon-proxy', {
       subcontainer: rconProxySub,
@@ -204,6 +218,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
             errorMessage: 'Web admin proxy is not ready',
           }),
       },
-      requires: [],
+      requires: ['rcon-admin'],
     })
 })
