@@ -13,6 +13,7 @@ Build your own little sovereign block world on your StartOS node.
 - Built-in web admin credentials action
 - Live in-game stats action (players, day/time, moon phase)
 - Whitelist controls directly in Actions
+- Configurable idle pause timer for empty servers
 
 ## Quick Start
 
@@ -29,6 +30,14 @@ Build your own little sovereign block world on your StartOS node.
   - `Setup`
   - `Info`
   - `Whitelist`
+
+## Idle pause behavior
+
+By default, vanilla Minecraft now pauses world ticking after the server has been empty for 60 seconds (`pause-when-empty-seconds=60`).
+
+You can change this in **Configure Server → Pause When Empty (seconds)**.
+- Use a positive value to keep auto-pause enabled.
+- Use `0` or `-1` to disable pause-when-empty entirely.
 
 ## Contributing
 

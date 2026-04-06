@@ -153,6 +153,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
           ENABLE_WHITELIST: config.whitelistEnabled ? 'true' : 'false',
           MOTD: config.motd,
           MAX_PLAYERS: config.maxPlayers.toString(),
+          PAUSE_WHEN_EMPTY_SECONDS: config.pauseWhenEmptySeconds.toString(),
           SERVER_PORT: gamePort.toString(),
         },
       },

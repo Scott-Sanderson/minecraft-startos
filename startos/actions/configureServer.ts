@@ -6,6 +6,7 @@ import {
   defaultMaximumMemory,
   defaultMaxPlayers,
   defaultMotd,
+  defaultPauseWhenEmptySeconds,
   defaultWhitelistEnabled,
   storeJson,
   normalizeStoreConfig,
@@ -170,6 +171,18 @@ const inputSpec = InputSpec.of({
     min: 1,
     max: 10000,
   }),
+  pauseWhenEmptySeconds: Value.number({
+    name: 'Pause When Empty (seconds)',
+    description:
+      'When no players are online, pause world ticking after this many seconds. Set to 0 or -1 to disable.',
+    required: true,
+    default: defaultPauseWhenEmptySeconds,
+    integer: true,
+    min: -1,
+    max: 86400,
+    step: 1,
+    units: 'seconds',
+  }),
   motd: Value.text({
     name: 'Message of the Day (MOTD)',
     description: 'Server description shown in the server list',
@@ -221,6 +234,7 @@ export const configureServer = sdk.Action.withInput(
               value: {},
             },
       maxPlayers: config.maxPlayers,
+      pauseWhenEmptySeconds: config.pauseWhenEmptySeconds,
       motd: config.motd,
       whitelistEnabled: config.whitelistEnabled,
     }
@@ -260,6 +274,7 @@ export const configureServer = sdk.Action.withInput(
       difficulty: input.difficulty as 'peaceful' | 'easy' | 'normal' | 'hard',
       memory: resolvedMemory,
       maxPlayers: input.maxPlayers,
+      pauseWhenEmptySeconds: input.pauseWhenEmptySeconds,
       motd: input.motd,
       whitelistEnabled: input.whitelistEnabled,
       whitelist: existingConfig?.whitelist ?? [],
