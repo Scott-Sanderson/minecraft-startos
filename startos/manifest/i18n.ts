@@ -8,7 +8,7 @@ export const shortDescription: LocalizedText = {
 
 export const longDescription: LocalizedText = {
   en_US:
-    'Minecraft Server is a vanilla Java Edition server with RCON-based web administration, configurable memory and idle pause behavior, whitelist management, and persistent world data.',
+    'Minecraft Server is a vanilla Java Edition server with RCON-based web administration, configurable memory, world, gameplay, and idle pause behavior, whitelist management, and persistent world data.',
 }
 
 export const installAlert: LocalizedText = {

@@ -9,6 +9,16 @@ export const defaultWhitelistEnabled = false
 export const defaultWebAdminUsername = 'admin'
 export const defaultMotd = 'A Minecraft Server on StartOS'
 export const defaultMaxPlayers = 20
+export const defaultPauseWhenEmptySeconds = 60
+export const defaultViewDistance = 10
+export const defaultSimulationDistance = 10
+export const defaultOnlineMode = true
+export const defaultSpawnProtection = 16
+export const defaultPvp = true
+export const defaultAllowFlight = false
+export const defaultHardcore = false
+export const defaultLevelName = 'world'
+export const defaultLevelSeed = ''
 
 export type WhitelistEntry = {
   name: string
@@ -45,6 +55,21 @@ const storeConfigSchema = z.object({
   webAdminPassword: z.string().optional().catch(undefined),
   motd: z.string().catch(defaultMotd),
   maxPlayers: z.number().int().catch(defaultMaxPlayers),
+  pauseWhenEmptySeconds: z.number().int().catch(defaultPauseWhenEmptySeconds),
+  viewDistance: z.number().int().min(2).max(32).catch(defaultViewDistance),
+  simulationDistance: z
+    .number()
+    .int()
+    .min(2)
+    .max(32)
+    .catch(defaultSimulationDistance),
+  onlineMode: z.boolean().catch(defaultOnlineMode),
+  spawnProtection: z.number().int().min(0).catch(defaultSpawnProtection),
+  pvp: z.boolean().catch(defaultPvp),
+  allowFlight: z.boolean().catch(defaultAllowFlight),
+  hardcore: z.boolean().catch(defaultHardcore),
+  levelName: z.string().min(1).catch(defaultLevelName),
+  levelSeed: z.string().catch(defaultLevelSeed),
 })
 
 export type StoreConfig = z.infer<typeof storeConfigSchema>

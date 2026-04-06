@@ -14,6 +14,7 @@ Build your own little sovereign block world on your StartOS node.
 - Live in-game stats action (players, day/time, moon phase)
 - Whitelist controls directly in Actions
 - Configurable idle pause timer for empty servers
+- High-value gameplay and world-generation settings in Configure Server
 
 ## Quick Start
 
@@ -38,6 +39,16 @@ By default, vanilla Minecraft now pauses world ticking after the server has been
 You can change this in **Configure Server → Pause When Empty (seconds)**.
 - Use a positive value to keep auto-pause enabled.
 - Use `0` or `-1` to disable pause-when-empty entirely.
+
+## Advanced server settings now exposed
+
+`Configure Server` now also surfaces:
+- View distance and simulation distance
+- Online mode, PvP, allow flight, and hardcore toggles
+- Spawn protection radius
+- World name and optional world seed
+
+World name/seed are mainly for initial world generation or intentionally switching world saves. Changing seed does not regenerate an existing world.
 
 ## Contributing
 
