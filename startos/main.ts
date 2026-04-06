@@ -8,9 +8,29 @@ import {
   webAdminWsPort,
 } from './utils'
 import { normalizeStoreConfig, storeJson } from './fileModels/store.json'
-import { writeFile } from 'fs/promises'
+import { rm, writeFile } from 'fs/promises'
 
 const rconWebAdminDbPath = '/opt/rcon-web-admin-0.14.1/db'
+const minecraftInitialHealthCheckDelay = 5_000
+const minecraftHealthGracePeriod = 30_000
+const whitelistPath = '/media/startos/volumes/main/whitelist.json'
+
+const delayFirstHealthCheck: typeof sdk.trigger.defaultTrigger =
+  async function* (getInput) {
+    await new Promise((resolve) =>
+      setTimeout(resolve, minecraftInitialHealthCheckDelay),
+    )
+    yield
+
+    const defaultTrigger = sdk.trigger.defaultTrigger(getInput)
+    for (
+      let result = await defaultTrigger.next();
+      !result.done;
+      result = await defaultTrigger.next()
+    ) {
+      yield result.value
+    }
+  }
 
 const proxyConfig = ({
   proxyPort,
@@ -79,12 +99,11 @@ export const main = sdk.setupMain(async ({ effects }) => {
     'minecraft-server-sub',
   )
 
-  // Write whitelist.json if enabled (to volume for persistence)
-  if (config.whitelistEnabled && config.whitelist.length > 0) {
-    await writeFile(
-      '/media/startos/volumes/main/whitelist.json',
-      JSON.stringify(config.whitelist, null, 2),
-    )
+  // Keep whitelist.json in sync with configured whitelist state.
+  if (config.whitelistEnabled) {
+    await writeFile(whitelistPath, JSON.stringify(config.whitelist, null, 2))
+  } else {
+    await rm(whitelistPath, { force: true })
   }
 
   // RCON Web Admin Daemon
@@ -126,24 +145,50 @@ export const main = sdk.setupMain(async ({ effects }) => {
           VERSION: minecraftVersion,
           MODE: config.gameMode,
           DIFFICULTY: config.difficulty,
+          LEVEL: config.levelName,
+          SEED: config.levelSeed,
           INIT_MEMORY: config.memory.initial,
           MAX_MEMORY: config.memory.maximum,
+          VIEW_DISTANCE: config.viewDistance.toString(),
+          SIMULATION_DISTANCE: config.simulationDistance.toString(),
           ENABLE_RCON: 'true',
           RCON_PASSWORD: config.rconPassword,
           RCON_PORT: rconPort.toString(),
+          ONLINE_MODE: config.onlineMode ? 'true' : 'false',
+          PVP: config.pvp ? 'true' : 'false',
+          ALLOW_FLIGHT: config.allowFlight ? 'true' : 'false',
+          HARDCORE: config.hardcore ? 'true' : 'false',
           ENABLE_WHITELIST: config.whitelistEnabled ? 'true' : 'false',
+          SPAWN_PROTECTION: config.spawnProtection.toString(),
           MOTD: config.motd,
           MAX_PLAYERS: config.maxPlayers.toString(),
+          PAUSE_WHEN_EMPTY_SECONDS: config.pauseWhenEmptySeconds.toString(),
           SERVER_PORT: gamePort.toString(),
         },
       },
       ready: {
         display: 'Minecraft Server',
-        fn: () =>
-          sdk.healthCheck.checkPortListening(effects, gamePort, {
+        gracePeriod: minecraftHealthGracePeriod,
+        trigger: delayFirstHealthCheck,
+        fn: async () => {
+          const minecraftStatus = await sdk.healthCheck.checkPortListening(
+            effects,
+            gamePort,
+            {
+              successMessage: 'Minecraft server is ready',
+              errorMessage: 'Minecraft server is not ready',
+            },
+          )
+
+          if (minecraftStatus.result !== 'success') {
+            return minecraftStatus
+          }
+
+          return sdk.healthCheck.checkPortListening(effects, rconPort, {
             successMessage: 'Minecraft server is ready',
-            errorMessage: 'Minecraft server is not ready',
-          }),
+            errorMessage: 'Minecraft server is ready, waiting for RCON',
+          })
+        },
       },
       requires: [],
     })
@@ -168,10 +213,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
             errorMessage: 'Web admin is not ready',
           }),
       },
-      // StartOS 0.4.0-alpha.16 rejects the SDK's intermediate "waiting"
-      // health state for daemon dependencies, so we avoid dependency gating
-      // here and let the web admin's own readiness check settle naturally.
-      requires: [],
+      requires: ['minecraft-server'],
     })
     .addDaemon('rcon-proxy', {
       subcontainer: rconProxySub,
@@ -186,6 +228,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
             errorMessage: 'Web admin proxy is not ready',
           }),
       },
-      requires: [],
+      requires: ['rcon-admin'],
     })
 })

@@ -8,7 +8,7 @@ export const getWebAdminCredentials = sdk.Action.withoutInput(
     description: 'Get login credentials for the RCON Web Admin UI',
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'Setup',
     visibility: 'enabled',
   }),
   async ({ effects }) => {

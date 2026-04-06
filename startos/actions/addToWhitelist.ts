@@ -29,7 +29,7 @@ export const addToWhitelist = sdk.Action.withInput(
     description: 'Add a player to the server whitelist (requires restart)',
     warning: 'The server will restart to apply whitelist changes.',
     allowedStatuses: 'any',
-    group: null,
+    group: '\u200bWhitelist',
     visibility: 'enabled',
   }),
   inputSpec,
