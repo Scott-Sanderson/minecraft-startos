@@ -20,7 +20,7 @@
     "semi": false,
     "singleQuote": true
   },
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "StartOS package for a vanilla Minecraft Java Edition server with RCON web admin.",
   "main": "index.js",
   "directories": {
