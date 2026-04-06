@@ -8,11 +8,12 @@ import {
   webAdminWsPort,
 } from './utils'
 import { normalizeStoreConfig, storeJson } from './fileModels/store.json'
-import { writeFile } from 'fs/promises'
+import { rm, writeFile } from 'fs/promises'
 
 const rconWebAdminDbPath = '/opt/rcon-web-admin-0.14.1/db'
 const minecraftInitialHealthCheckDelay = 5_000
 const minecraftHealthGracePeriod = 30_000
+const whitelistPath = '/media/startos/volumes/main/whitelist.json'
 
 const delayFirstHealthCheck: typeof sdk.trigger.defaultTrigger =
   async function* (getInput) {
@@ -98,12 +99,11 @@ export const main = sdk.setupMain(async ({ effects }) => {
     'minecraft-server-sub',
   )
 
-  // Write whitelist.json if enabled (to volume for persistence)
-  if (config.whitelistEnabled && config.whitelist.length > 0) {
-    await writeFile(
-      '/media/startos/volumes/main/whitelist.json',
-      JSON.stringify(config.whitelist, null, 2),
-    )
+  // Keep whitelist.json in sync with configured whitelist state.
+  if (config.whitelistEnabled) {
+    await writeFile(whitelistPath, JSON.stringify(config.whitelist, null, 2))
+  } else {
+    await rm(whitelistPath, { force: true })
   }
 
   // RCON Web Admin Daemon
