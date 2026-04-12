@@ -2,6 +2,7 @@ import { utils } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 import { storeJson } from '../fileModels/store.json'
 import { configureServer } from '../actions/configureServer'
+import { createWorld } from '../actions/createWorld'
 import { getConnectionInfo } from '../actions/getConnectionInfo'
 import { getWebAdminCredentials } from '../actions/getWebAdminCredentials'
 
@@ -30,6 +31,13 @@ export const initializeService = sdk.setupOnInit(async (effects, kind) => {
       replayId: 'minecraft-configure-server',
     },
   )
+
+  if (kind === 'install') {
+    await sdk.action.createOwnTask(effects, createWorld, 'important', {
+      reason: 'Choose your initial world name and optional seed before first start',
+      replayId: 'minecraft-create-initial-world',
+    })
+  }
 
   await sdk.action.createOwnTask(effects, getWebAdminCredentials, 'important', {
     reason: 'Retrieve your web admin credentials',
