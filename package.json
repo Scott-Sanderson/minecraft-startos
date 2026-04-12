@@ -6,7 +6,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "^0.4.0-beta.66"
+    "@start9labs/start-sdk": "1.0.0",
+    "prismarine-nbt": "^2.8.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",
@@ -32,7 +33,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Scott-Sanderson/minecraft-startos/issues"

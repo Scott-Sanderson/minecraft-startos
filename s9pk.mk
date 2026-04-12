@@ -55,17 +55,13 @@ install: $(PACKAGE_ID).s9pk | check-deps check-init
 		echo "Error: You must define \"host: http://server-name.local\" in ~/.startos/config.yaml"; \
 		exit 1; \
 	fi; \
-	S9PK=$$(ls -t *.s9pk 2>/dev/null | head -1); \
-	if [ -z "$$S9PK" ]; then \
-		echo "Error: No .s9pk file found. Run 'make' first."; \
-		exit 1; \
-	fi; \
+	S9PK="$(PACKAGE_ID).s9pk"; \
 	printf "\n🚀 Installing %s to %s ...\n" "$$S9PK" "$$HOST"; \
 	start-cli package install -s "$$S9PK"
 
 check-deps:
 	@command -v start-cli >/dev/null || \
-		(echo "Error: start-cli not found. Please see https://docs.start9.com/latest/developer-guide/sdk/installing-the-sdk" && exit 1)
+		(echo "Error: start-cli not found. Please see https://docs.start9.com/packaging/0.4.0.x/environment-setup.html#start-cli" && exit 1)
 	@command -v npm >/dev/null || \
 		(echo "Error: npm not found. Please install Node.js and npm." && exit 1)
 

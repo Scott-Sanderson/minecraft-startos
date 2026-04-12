@@ -3,7 +3,6 @@ import {
   defaultDifficulty,
   defaultGameMode,
   defaultInitialMemory,
-  defaultLevelName,
   defaultAllowFlight,
   defaultHardcore,
   defaultMaximumMemory,
@@ -250,24 +249,6 @@ const inputSpec = InputSpec.of({
     step: 1,
     units: 'seconds',
   }),
-  levelName: Value.text({
-    name: 'World Name',
-    description:
-      'Folder/name for the world save. Changing this later switches to a different world save name.',
-    required: true,
-    default: defaultLevelName,
-    placeholder: defaultLevelName,
-    masked: false,
-  }),
-  levelSeed: Value.text({
-    name: 'World Seed (Optional)',
-    description:
-      'Seed used when creating a new world. Leave blank for random. Changing this does not regenerate an existing world.',
-    required: false,
-    default: null,
-    placeholder: 'Leave blank for random',
-    masked: false,
-  }),
   motd: Value.text({
     name: 'Message of the Day (MOTD)',
     description: 'Server description shown in the server list',
@@ -289,7 +270,7 @@ export const configureServer = sdk.Action.withInput(
     name: 'Configure Server',
     description: 'Configure your Minecraft server settings',
     warning:
-      'This will overwrite your current configuration. The server must be restarted for changes to take effect. World Name and World Seed only affect new or switched world saves.',
+      'This will overwrite your current configuration. The server must be restarted for changes to take effect. Use List Worlds, Select World, and Create World in the Worlds action group to manage world saves.',
     allowedStatuses: 'any',
     group: 'Setup',
     visibility: 'enabled',
@@ -327,8 +308,6 @@ export const configureServer = sdk.Action.withInput(
       hardcore: config.hardcore,
       spawnProtection: config.spawnProtection,
       pauseWhenEmptySeconds: config.pauseWhenEmptySeconds,
-      levelName: config.levelName,
-      levelSeed: config.levelSeed || null,
       motd: config.motd,
       whitelistEnabled: config.whitelistEnabled,
     }
@@ -376,8 +355,6 @@ export const configureServer = sdk.Action.withInput(
       hardcore: input.hardcore,
       spawnProtection: input.spawnProtection,
       pauseWhenEmptySeconds: input.pauseWhenEmptySeconds,
-      levelName: input.levelName,
-      levelSeed: input.levelSeed ?? '',
       motd: input.motd,
       whitelistEnabled: input.whitelistEnabled,
       whitelist: existingConfig?.whitelist ?? [],

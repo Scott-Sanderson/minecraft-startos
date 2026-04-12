@@ -1,7 +1,6 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { minecraftImageTag, minecraftVersion } from '../utils'
+import { minecraftImageTag } from '../utils'
 import {
-  defaultLocale,
   installAlert,
   longDescription,
   restoreAlert,
@@ -19,10 +18,10 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://github.com/itzg/docker-minecraft-server',
   marketingUrl: 'https://www.minecraft.net/',
   donationUrl: null,
-  docsUrls: ['https://minecraft.wiki/w/Commands'],
+  docsUrls: ['https://docker-minecraft-server.readthedocs.io/'],
   description: {
-    short: shortDescription[defaultLocale],
-    long: longDescription[defaultLocale],
+    short: shortDescription,
+    long: longDescription,
   },
   volumes: ['main'],
   images: {
@@ -40,12 +39,12 @@ export const manifest = setupManifest({
     },
   },
   alerts: {
-    install: installAlert[defaultLocale],
-    update: updateAlert[defaultLocale],
-    uninstall: uninstallAlert[defaultLocale],
-    restore: restoreAlert[defaultLocale],
+    install: installAlert,
+    update: updateAlert,
+    uninstall: uninstallAlert,
+    restore: restoreAlert,
     start: null,
-    stop: stopAlert[defaultLocale],
+    stop: stopAlert,
   },
   dependencies: {},
 })
