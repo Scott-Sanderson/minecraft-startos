@@ -42,7 +42,7 @@ Web Admin experience.
 | Proxy image | `nginx:1.27-alpine` |
 | Architectures | x86_64, aarch64 |
 | Entry command | Upstream entrypoint (`sdk.useEntrypoint()`) |
-| StartOS-managed upstream version | `VERSION=26.1` |
+| StartOS-managed upstream version | `VERSION=26.1.2` |
 
 ---
 
@@ -169,7 +169,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for local build, install, and release wor
 
 ```yaml
 package_id: minecraft
-upstream_version: "26.1"
+upstream_version: "26.1.2"
 image: "itzg/minecraft-server:java25@sha256:847b459c2bc263fe31838eb0b4e3d321d851b9071d94f658439ec53f2db57e6b"
 architectures: [x86_64, aarch64]
 volumes:
