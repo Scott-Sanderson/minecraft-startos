@@ -101,7 +101,7 @@ Internal-only service ports:
 | `configure-server` | Configure gameplay/server settings | any |
 | `list-worlds` | Inspect saved worlds and metadata | any |
 | `create-world` | Stage a new world name/seed | any |
-| `select-world` | Switch configured world | any |
+| `select-world` | Switch active world | any |
 | `delete-world` | Permanently delete a world save | only-stopped |
 | `get-web-admin-credentials` | Reveal Web Admin login credentials | only-running |
 | `get-server-info` | Show configured server settings | only-running |
