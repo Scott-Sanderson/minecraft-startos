@@ -1,17 +1,30 @@
-# Instructions for Hello World on StartOS
+# Minecraft Server on StartOS
 
-Hello World is a bare bones template for bootstrapping packages for StartOS.
+Minecraft Server on StartOS runs a vanilla Java Edition server with a built-in
+web admin experience.
 
-## How to use the template
+## First-time setup
 
-1. Access [hello-world-startos](https://github.com/Start9Labs/hello-world-startos).
+1. Start the package and run **Configure Server** to set your gameplay options
+   (difficulty, mode, memory profile, world settings, and player limits).
+2. Run **Get Web Admin Credentials**, then open the **Web Admin** interface and
+   sign in.
+3. Run **Get Connection Info** and share the server address with players.
 
-1. Click "Use this template", then "Create new repository". You must be signed into Github to see this button.
+## Common management actions
 
-1. Name your repository. The name should be `[service-name]-startos`. For example, `NextCloud` is `nextcloud-startos` and `Lightning Terminal` is `lightning-terminal-startos`.
+1. Use **Configure Server** whenever you want to change server behavior.
+2. Use **List Worlds**, **Create World**, **Select World**, and **Delete World**
+   to manage world saves.
+3. Use **Add to Whitelist** / **Remove from Whitelist** to control player
+   access.
+4. Use **Get Live Server Stats** and **Get Server Info** for runtime details.
 
-1. For the repository description, enter "StartOS package for [Service Name]".
+## Important notes
 
-1. Make sure the repository is Public.
+1. Stopping the service disconnects all players.
+2. Uninstalling the package permanently removes world data.
+3. Backups include your world data and package settings.
 
-1. Click "Create Repository".
+For features not covered here, refer to upstream docs:
+<https://docker-minecraft-server.readthedocs.io/>

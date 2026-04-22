@@ -104,7 +104,7 @@ Internal-only service ports:
 | `select-world` | Switch active world | any |
 | `delete-world` | Permanently delete a world save | only-stopped |
 | `get-web-admin-credentials` | Reveal Web Admin login credentials | only-running |
-| `get-server-info` | Show configured server settings | only-running |
+| `get-server-info` | Show active server settings | only-running |
 | `get-live-server-stats` | Query live stats via RCON | only-running |
 | `get-connection-info` | Show best client connection address | only-running |
 | `add-to-whitelist` | Add player and enable whitelist | any |
