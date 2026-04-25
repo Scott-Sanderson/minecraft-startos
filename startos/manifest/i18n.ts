@@ -24,15 +24,15 @@ export const longDescription: LocalizedText = {
 
 export const installAlert: LocalizedText = {
   en_US:
-    'Minecraft server installed! Access the Web Admin UI or use actions to get connection details.',
+    'Minecraft server installed. Complete setup tasks, then use Interfaces to choose your preferred client connection address.',
   es_ES:
-    'Servidor Minecraft instalado. Abre la interfaz Web Admin o usa las acciones para obtener los datos de conexion.',
+    'Servidor Minecraft instalado. Completa las tareas de configuracion y luego usa Interfaces para elegir la direccion de conexion de cliente que prefieras.',
   de_DE:
-    'Minecraft-Server installiert. Nutze die Web-Admin-Oberflaeche oder Aktionen fuer Verbindungsdetails.',
+    'Minecraft-Server installiert. Erledige die Einrichtungsaufgaben und nutze dann Interfaces, um die gewuenschte Verbindungsadresse zu waehlen.',
   pl_PL:
-    'Serwer Minecraft zainstalowany. Otworz panel Web Admin lub uzyj akcji, aby pobrac dane polaczenia.',
+    'Serwer Minecraft zainstalowany. Wykonaj zadania konfiguracji, a nastepnie w Interfaces wybierz preferowany adres polaczenia klienta.',
   fr_FR:
-    'Serveur Minecraft installe. Utilisez Web Admin ou les actions pour recuperer les informations de connexion.',
+    'Serveur Minecraft installe. Terminez les taches de configuration, puis utilisez Interfaces pour choisir votre adresse de connexion client preferee.',
 }
 
 export const updateAlert: LocalizedText = {

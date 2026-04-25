@@ -9,7 +9,8 @@ web admin experience.
    (difficulty, mode, memory profile, world settings, and player limits).
 2. Run **Get Web Admin Credentials**, then open the **Web Admin** interface and
    sign in.
-3. Run **Get Connection Info** and share the server address with players.
+3. Open **Interfaces** in StartOS and choose the connection address you want to
+   share with players.
 
 ## Common management actions
 
