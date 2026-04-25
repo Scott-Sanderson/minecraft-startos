@@ -64,8 +64,8 @@ On first install, the package:
 1. Generates strong random credentials for RCON and Web Admin.
 2. Creates onboarding tasks:
    - **critical**: Configure Server
+   - **important**: Create World
    - **important**: Get Web Admin Credentials
-   - **optional**: Get Connection Info
 
 ---
 
@@ -87,6 +87,8 @@ new state on restart/reload behavior managed by the package.
 | `minecraft-server` | 25565 | TCP | Minecraft Java Edition client connections |
 | `web-admin` | 8080 | HTTP | RCON Web Admin UI (proxied) |
 
+Choose your preferred connection address from the **Interfaces** page in StartOS.
+
 Internal-only service ports:
 - `25575` RCON endpoint (used by sidecars/actions)
 - `4326` RCON Web Admin service
@@ -101,12 +103,11 @@ Internal-only service ports:
 | `configure-server` | Configure gameplay/server settings | any |
 | `list-worlds` | Inspect saved worlds and metadata | any |
 | `create-world` | Stage a new world name/seed | any |
-| `select-world` | Switch configured world | any |
+| `select-world` | Switch active world | any |
 | `delete-world` | Permanently delete a world save | only-stopped |
 | `get-web-admin-credentials` | Reveal Web Admin login credentials | only-running |
-| `get-server-info` | Show configured server settings | only-running |
+| `get-server-info` | Show active server settings | only-running |
 | `get-live-server-stats` | Query live stats via RCON | only-running |
-| `get-connection-info` | Show best client connection address | only-running |
 | `add-to-whitelist` | Add player and enable whitelist | any |
 | `remove-from-whitelist` | Remove player and auto-disable empty whitelist | any |
 
@@ -214,7 +215,6 @@ actions:
   - get-web-admin-credentials
   - get-server-info
   - get-live-server-stats
-  - get-connection-info
   - add-to-whitelist
   - remove-from-whitelist
 ```

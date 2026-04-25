@@ -364,7 +364,7 @@ export const configureServer = sdk.Action.withInput(
       version: '1',
       title: 'Configuration Saved',
       message:
-        'Your Minecraft server has been configured successfully. Start the service to apply changes.',
+        'Configuration saved. Start or restart the service to apply these settings.',
       result: null,
     }
   },

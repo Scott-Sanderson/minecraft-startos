@@ -3,7 +3,6 @@ import { sdk } from '../sdk'
 import { storeJson } from '../fileModels/store.json'
 import { configureServer } from '../actions/configureServer'
 import { createWorld } from '../actions/createWorld'
-import { getConnectionInfo } from '../actions/getConnectionInfo'
 import { getWebAdminCredentials } from '../actions/getWebAdminCredentials'
 
 export const initializeService = sdk.setupOnInit(async (effects, kind) => {
@@ -42,10 +41,5 @@ export const initializeService = sdk.setupOnInit(async (effects, kind) => {
   await sdk.action.createOwnTask(effects, getWebAdminCredentials, 'important', {
     reason: 'Retrieve your web admin credentials',
     replayId: 'minecraft-web-admin-credentials',
-  })
-
-  await sdk.action.createOwnTask(effects, getConnectionInfo, 'optional', {
-    reason: 'Retrieve the Minecraft address and port for your clients',
-    replayId: 'minecraft-connection-info',
   })
 })
